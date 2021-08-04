@@ -1,0 +1,3 @@
+call read_dir.udf
+
+read_dir('g:\notes\d_Drive.txt')

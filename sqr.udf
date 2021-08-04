@@ -1,0 +1,31 @@
+function sqr($x,Optional $n)
+;SQR (raise a number to a power of x)
+;
+;returns:
+;	will return a number squared, or raised to the power of x
+;
+;Syntax:
+;	$return = sqr({value},OPTIONAL{Power of X})
+;	{value}.........Any number that you want to square or raise to the power of x
+;	{power of x}....this is an options value, if left out the fonction will by 
+;                       default sqr {value}, but if you want to $x^3 you can enter 3 
+;                       for this value.
+;
+;Example:
+;	$4squared = sqr(4)
+;	$4cubed   = sqr(4,3)
+;	;5^10
+;       $value = sqr(5,10)
+DIM $z,$loop
+	if not $n
+		$n = 2.0
+	else
+		$n = int($n)
+	endif
+
+	$z = $x
+	for $loop = 1 to $n-1
+		$z = $x * $z
+	next
+	$sqr = $z
+endfunction

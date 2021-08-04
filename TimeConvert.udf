@@ -1,0 +1,73 @@
+;Function	TimeConvert
+;
+;Author		Bryce Lindsay Bryce@isorg.net
+;
+;Action		Converts Military time to standatd time or 
+;		Converts standard time to military time
+;
+;Syntax		TimeConvert("time")
+;
+;Version	1.0
+;
+;Date           10.12.2004
+;
+;Date Revised   10.12.2004
+;
+;Parameters 	TIME
+;		Any time format.  "HH:MM" or "HH:MM:SS.mm"  or "HH:MM am"
+;
+;Remarks	simply converts ont time format to another.  Give it a standard
+;		time format and military time is returned.  Give it Militart time
+;		and standard time is returned.
+;
+;Returns	a string that is equal to the requested time format
+; 
+;Dependencies 	None
+;
+;KiXtart Ver	4.02
+; 
+;Example(s)	$Mtime = TimeConvert("1:45 pm")
+;		;$mtime is equal to "13:45"
+;
+Function TimeConvert($time)
+	dim $ampm
+	if right($time,2) = "am" or right($time,2) = "pm"
+		$ampm = right($time,2)
+		$time = left($time,len($time)-2)
+	endif
+	$time = split($time,":")
+	if ubound($time) < 0
+		exit(2)
+	endif
+	if $ampm
+		;imperial to mil
+		select
+		   case $ampm = "am" 
+			if $time[0] = 12
+				$time[0] = right("0"+(val($time[0]) - 12),2)
+			else
+				$time[0] = right("0"+$time[0],2)
+			endif
+		   case $ampm = "pm"
+			if $time[0] <> 12
+				$time[0] = val($time[0]) + 12
+			endif
+		endselect
+	else
+		;mil time to imperial
+		select
+			case val($time[0]) > 12
+				$time[0] = val($time[0]) - 12
+				$time[ubound($time)] = $time[ubound($time)] + " PM"
+			case val($time[0]) = 12
+				$time[ubound($time)] = $time[ubound($time)] + " PM"
+			case val($time[0]) = 0
+				$time[0] = 12
+				$time[ubound($time)] = $time[ubound($time)] + " AM"
+			case val($time[0]) < 12
+				$time[0] = val($time[0])
+				$time[ubound($time)] = $time[ubound($time)] + " AM"
+		endselect
+	endif
+	$TimeConvert = join($time,":")
+endfunction

@@ -1,0 +1,68 @@
+
+
+Break ON
+   
+$=SetOption("Break","ON")
+   
+$iIntervalCheck=30		; Check every thirty seconds.
+   
+$iThresholdValue=0,5,30,50,80,95
+$sThresholdText="I have no time right now!", "Busy", "In use", "A little idle", "Idle", "Very Idle"
+$sThresholdColour="r+", "r", "y", "y+", "g", "g+"
+   
+$strComputer = "."
+$objWMIService = GetObject("winmgmts:\\" + $strComputer + "\root\cimv2")
+If @ERROR @ERROR ": " @SERROR ? EndIf
+   
+; Get initial status
+$iLastTime=Int(@TICKS/1000)
+$iLastIdle=GetIdleSeconds()
+   
+$iNumCPU=GetCPUCount()
+   
+@TIME+" Waiting for first "+$iIntervalCheck+" second interval to expire, CPU count is "+$iNumCPU ?
+While Not KBHit()
+	Sleep $iIntervalCheck
+	$iThisIdle=GetIdleSeconds()
+	$iThisTime=Int(@TICKS/1000)
+	$iDeltaIdle=$iThisIdle-$iLastIdle
+	$iDeltaTime=$iThisTime-$iLastTime
+	$iPercentIdle=CInt(($iDeltaIdle*100/$iDeltaTime)/$iNumCPU)
+	For $i=0 to 5
+		If $iPercentIdle>=$iThresholdValue[$i] $iIndex=$i EndIf
+	Next
+
+	Color $sThresholdColour[$iIndex]/n
+	Chr(13)+"                                                                 "+CHR(13)
+	@TIME+" Idle: "+$iPercentIdle+"% "+$sThresholdText[$iIndex]
+
+	$iLastIdle=$iThisIdle
+	$iLastTime=$iThisTime
+Loop
+   
+Get $
+Exit 0
+
+
+   
+Function GetIdleSeconds()
+	$GetIdleSeconds=0
+	$colItems = $objWMIService.ExecQuery('Select KernelModeTime from Win32_Process where Handle="0"',,48)
+	For Each $objProcess in $colItems
+		$GetIdleSeconds=$objProcess.KernelModeTime
+		; Time is in nanoseconds - Too much!
+		$GetIdleSeconds=CInt(SubStr($GetIdleSeconds,1,Len($GetIdleSeconds)-7))
+		Exit 0
+	Next
+	Exit 1
+EndFunction
+   
+Function GetCPUCount()
+	$GetCPUCount=1
+	$colItems = $objWMIService.ExecQuery('Select NumberOfProcessors from Win32_ComputerSystem',,48)
+	For Each $objComputer in $colItems
+		$GetCPUCount=$objComputer.NumberOfProcessors
+		Exit 0
+	Next
+	Exit 1
+EndFunction

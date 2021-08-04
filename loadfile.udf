@@ -1,0 +1,16 @@
+Function loadfile($file, optional $array, $Uni)
+	DIM $fso,$f,$fs
+	if $uni $uni = $uni-3 else $uni = -2 endif
+
+	if not $uni $uni = -2 endif
+	$fso = CreateObject("Scripting.FileSystemObject")
+	$f = $fso.GetFile($file)
+	If @ERROR Exit 2 EndIf
+	$fs = $f.OpenAsTextStream(1,$uni)
+	if not $array
+		$loadfile = $fs.Read($f.size)
+	else
+		$loadfile = Split($fs.Read($f.size),$array)
+	endif
+	Exit @ERROR 
+EndFunction

@@ -1,0 +1,30 @@
+? 
+nslookup('isorg.com')
+
+? @error
+
+Function NSLookup($_ID)
+ 
+  Dim $_sR			; Return string 
+  Dim $_oExec			; WScript object 
+ 
+  ; Use WScript to execute the command and check the result 
+  $_oExec = CreateObject("WScript.Shell").Exec('nslookup ' + $_ID)
+  If Not VarType($_oExec) = 9
+    $NSLookup = ''
+    Exit 10
+  EndIf
+ 
+  ; get the command result and extract what is needed 
+  $_sR = Trim(Split(Join(Split($_oExec.StdOut.ReadAll, @CRLF), ''),'name:')[1]) 
+ 
+  ; process the return string 
+  If Not $_sR
+    $NSLookup = ''
+    Exit 67
+  Else
+    $NSLookup = Split($_sR, 'Address:')[0] + ',' + Trim(Split($_sR, 'Address:')[1])
+    Exit 0
+  EndIf
+ 
+EndFunction

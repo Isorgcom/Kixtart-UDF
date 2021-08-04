@@ -1,0 +1,19 @@
+Function SQRT($x)
+;SQRT (Square Root)
+;
+;Returns:  the square root of a given number
+;
+;Syntax:
+;	$return = sqrt([value])
+;	[value].......any positive number
+;
+;Example;
+;	$SQRTof4 = sqrt(4.0)
+dim $y,$z
+	$y = 1.0
+	while $y <> $z
+		$z = $y
+		$y = (($x/$y)+$y)/2
+	loop
+	$sqrt = $y
+endfunction

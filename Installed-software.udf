@@ -1,0 +1,15 @@
+break on
+
+Installed_Software
+
+function Installed_Software()
+	dim $uninstall
+	$uninstall = "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\"
+
+	while not @error
+		? $key "..."
+		? readvalue($uninstall+$key,"UninstallString")
+		$Key = EnumKey($uninstall, $index)
+		$index = $index + 1
+	Loop
+endfunction

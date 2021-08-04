@@ -1,0 +1,19 @@
+Function serialtime($t,optional $m)
+ $t = split($t,":")
+ if ubound($t) = 2
+  $serialtime = (val($t[0])*3600) + val($t[1])*60 + val($t[2])
+  if $m
+   $serialtime = cdbl(""+$serialtime+"."+right("00"+$m,3))
+  endif
+ else
+  $t = cdbl(join($t,""))
+  if instr($t,".")
+   $m = cdbl("0" + substr($t,instr($t,".")))
+   $t = val(substr($t,1,instr($t,".")-1))
+  endif
+  $serialtime = right("0"+val($t/3600),2) +":" +
+  right("0"+($t mod 3600)/60,2) +":"+
+  right("0"+($t mod 3600) mod 60,2)
+  if $m $serialtime = $serialtime + "." + val(($m*1000)) endif
+ endif
+endfunction

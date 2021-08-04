@@ -1,0 +1,11 @@
+
+;this function will load all *.udf files found in the given folder.
+function LoadUDF($path)
+	dim $file
+	$file = dir('$path\*.udf')
+	while not @error
+		call $path + "\" + $file
+		? $path + "\" + $file
+		$file = dir() 
+	loop
+endfunction

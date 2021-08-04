@@ -1,0 +1,74 @@
+;Function      FlipcTime()
+;
+;ACTION        Converts a Kixtart format date/time into a cTime time
+;
+;AUTHOR        Bryce Lindsay
+;
+;VERSION       1.0 first publish
+;              1.1 removed dependencies
+;              1.2 added Time Zone support
+;              1.3 added optional epoc date, fixed the 32bit bug!
+;
+;KIXTART       4.22+
+;
+;SYNTAX        RETCODE = FLIPCTIME(DATE,TIME,[TIME ZONE],[Epoc Date])
+;
+;PARAMETERS    DATE
+;              Date In YYYY/MM/DD
+;
+;              TIME
+;              Time In HH:MM[:SS]
+;
+;              Optional ZIME ZONE
+;              the timezone that you want To adjust For.
+;
+;              Optional Epoc date
+;              if no epoc date is given, then 1970/1/1 is used
+;
+;Return        the given date/time In number of seconds that have passed since the Epoc date (default is 1970/1/1)
+;
+;REMARKS       See this thread For original idea
+;              http://www.kixtart.org/ubbthreads/showflat.php?Cat=&Number=80863
+;              Also know as UNIX time.
+;
+;DEPENDENCIES  None
+;
+;              ;give the Epoc time For the central time zone In the US(-6)
+;EXAMPLE       $Return = FlipcTime("2004/07/08","14:45:23",-6)
+;
+;              ;number of seconds that have passed since 1900/1/1
+;              $return = flipctime(@DATE,@TIME,'','1900/1/1')
+;              
+Function FlipcTime($date,$time,optional $tz,$epoc)
+	DIM $y,$m,$d
+	$tz = Val($tz)
+	$date = Split($date,"/")
+	If UBound($date) <> 2 Exit(1) EndIf
+	$y=Val($date[0]) $m=Val($date[1]) $d=Val($date[2])
+	If $m<3
+		$m=$m+12
+		$y=$y-1
+	EndIf
+	$Date=CDbl($d)+(153*$m-457)/5+365*$y+$y/4-$y/100+$y/400-306
+	If $epoc
+		$epoc = Split($epoc,'/') If UBound($epoc) <> 2 Quit 1 EndIf
+		If 0+$epoc[1]<3
+			$epoc[1]=0+$epoc[1]+12
+			$epoc[0]=0+$epoc[0]-1
+		EndIf
+		$epoc= 0+$epoc[2]+(153*$epoc[1]-457)/5+365*$epoc[0]+$epoc[0]/4-$epoc[0]/100+$epoc[0]/400-306
+	Else
+		$epoc = 719163
+	EndIf
+	$time = Split($time,":")
+	Select 
+		Case UBound($time)=1
+			ReDIM preserve $time[2]
+			$time[2]=0
+		Case UBound($time)=2
+		Case 1
+			Exit(1)
+	EndSelect
+	$time = (Val(CDbl($time[0]))*3600)+(Val($time[1])*60)+Val($time[2])
+	$flipctime = IIf(Val($tz),(($date-$epoc)*86400 + $time)-($tz*3600),($date-$epoc)*86400 + $time)
+EndFunction

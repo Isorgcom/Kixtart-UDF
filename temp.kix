@@ -1,0 +1,24 @@
+
+sleep 5
+
+? GetIdleSeconds()/60
+
+
+
+Function GetIdleSeconds()
+	dim $objWMIService, $colItems, $objProcess 
+	$objWMIService = GetObject("winmgmts:\\" + "." + "\root\cimv2")
+	$GetIdleSeconds=0
+	$colItems = $objWMIService.ExecQuery('Select KernelModeTime from Win32_Process where Handle="0"',,48)
+	For Each $objProcess in $colItems
+		$GetIdleSeconds=$objProcess.KernelModeTime
+		; Time is in nanoseconds - Too much!
+		$GetIdleSeconds=CInt(SubStr($GetIdleSeconds,1,Len($GetIdleSeconds)-7))
+		Exit 0
+	Next
+	Exit 1
+EndFunction
+
+
+
+

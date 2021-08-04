@@ -1,0 +1,68 @@
+
+;; 
+;;====================================================================== 
+;; 
+;;FUNCTION       EnumIni() 
+;; 
+;;ACTION         Enumerates sections or keys of an INI file 
+;; 
+;;AUTHOR         Glenn Barnas  
+;; 
+;;VERSION        2.0 
+;; 
+;;DATE CREATED   2003/11/17 
+;; 
+;;DATE MODIFIED  2004/10/16 
+;; 
+;;SYNTAX         EnumIni(File [, Section]) 
+;; 
+;;PARAMETERS     File - 	REQUIRED, path/name of INI file to examine 
+;; 
+;;               Section -	OPTIONAL, Section name to parse 
+;; 
+;;REMARKS        Returns an array containing the sections in an INI file, or 
+;;               an array of key names in a specified section. Errors are returned 
+;;               for non-existant files or INI file reads. If the specified file 
+;;               contains no sections, or the specified section contains no keys, 
+;;               the UDF exits with error 13 and returns a null array. Thus, a For-Each loop 
+;;               will properly perform no iterations if no data is returned. 
+;; 
+;;               CAUTION - Error 13 is returned for empty files, or nonexistant sections. 
+;;                         This is not necessarily a "failure". 
+;; 
+;;RETURNS        Array of sections or keys in a section 
+;; 
+;;DEPENDENCIES   none 
+;; 
+;;TESTED WITH    Kix 4.2+, NT4, W2K, WXP, W2K3 
+;; 
+;;EXAMPLES       $Sections = EnumIni('.\config.ini') 
+;;               $Keys = EnumIni('.\config.ini', 'Common') 
+; 
+Function EnumIni($_fSrcFile, OPTIONAL $_fSectName)
+ 
+  Dim $_fSectList
+ 
+  ; die if the file doesn't exist 
+  If Exist($_fSrcFile) = 0
+    Exit 2
+  EndIf
+ 
+  ; Get the list of sections or keys 
+  $_fSectList = ReadProfileString($_fSrcFile, $_fSectName, '')
+  ; Return if error occurred 
+  If @ERROR
+    Exit @ERROR
+  EndIf
+ 
+  ; If len is >0, return an array of sections 
+  ; If len is 0, either no sections or keys exist, or an invalid section name was specified. Return nothing. 
+  If Len($_fSectList) > 0
+    $EnumIni = Split(Left($_fSectList,len($_fSectList)-1), Chr(10))
+    Exit 0
+  EndIF
+ 
+  ; return an error here for value not found (no sections or no keys in section) 
+  Exit 13
+ 
+EndFunction

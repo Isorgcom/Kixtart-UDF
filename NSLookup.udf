@@ -1,0 +1,26 @@
+for each $ip in nslookup('google.com','4.2.2.2')
+	? $ip
+next
+
+
+Function NSLookup($alias, optional $server)
+	dim $data, $address, $ips
+	if instr($data,'Non-existent domain')
+		$nslookup = 0
+		exit(2)
+	endif
+	$data = CreateObject("WScript.Shell").Exec('nslookup ' + $alias + " " +$server).StdOut.ReadAll
+	$data = split(split($data,'Name:  ')[1],'Address')[1]
+	if not $data
+		$nslookup = 0
+		exit(2)
+	endif
+	if instr($data,'Alias')
+		$data = split($data,'Alias')[0]
+	endif
+	$data = substr($data,instr($data,':')+1)
+	$data = replace($data,'	','')
+	$nslookup = split(trim(replace(replace(replace($data,@crlf,''),',',''),'  ',' ')))
+endfunction
+
+	

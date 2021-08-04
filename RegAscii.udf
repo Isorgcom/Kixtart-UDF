@@ -1,0 +1,59 @@
+;FUNCTION RegASCIItoHEX
+;
+;AUTHOR Bryce
+;
+;ACTION Converts a ASCII string to a HEX string that can be written to the registry.
+;
+;SYNTAX RegASCIItoHEX($string)
+;
+;PARAMETERS String - string of ASCII to be converted
+;
+;RETURNS the HEX version of the given ASCII string
+;
+;DEPENDENCIES none.
+;
+;EXAMPLE
+; $categories = "Things;More things;And even more things!!"
+; ? RegASCIItoHEX($categories)
+;
+;CODE
+Function RegASCIItoHEX($data)
+	dim $return, $i
+	$return = ""
+
+	for $i = 1 to len($data)
+		$return = $return + dectohex(asc(substr($data,$i,1)))+ "00"
+	next
+	$return = lcase($return) + "0000"
+	$regASCIItoHex = $return
+endfunction
+
+
+;FUNCTION RegHEXtoASCII
+;
+;AUTHOR Bryce
+;
+;ACTION Converts a registry HEX string key to an ASCII string
+;
+;SYNTAX RegHEXtoASCII($string)
+;
+;PARAMETERS String - string of HEX to be converted
+;
+;RETURNS the ASCII version of the given HEX string
+;
+;DEPENDENCIES none.
+;
+;EXAMPLE
+; $xpkey = "HKEY_CURRENT_USER\Software\Microsoft\Office\10.0\Outlook\Categories"
+; ? "The list of Categories in outlook 2002"
+; ? RegHEXtoASCII(readvalue($xpkey,"Masterlist"))
+;
+;CODE
+Function RegHextoAscii($data)
+	dim $return, $i, $hex
+	for $i = 1 to len($data) step 2
+		$hex = "&" + substr($data,$i,2)
+		$return = $return + chr(val($hex))
+	next
+	$reghextoascii = $return
+endfunction
