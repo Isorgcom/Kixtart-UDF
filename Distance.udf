@@ -1,0 +1,56 @@
+/* Function	Distance()
+
+Author		Bryce Lindsay
+
+Action		Returns the distance between 2 points
+
+Syntax		Distance(Point1, Point2)
+
+Version		1.0
+
+Date		1:04 PM 9/13/2006
+
+Date Revised	1:04 PM 9/13/2006
+
+Parameters	Point#
+		This is a string of coordinates, X,Y You can also use 
+		an optional Z.  
+		use a , to set X Y "33,2"  or with the optional Z "33,2,10"
+
+Remarks		This is just the Pythagorean theorem....
+
+Returns		Distance between two points.
+
+Dependencies	SQRT(), SQR()
+
+KiXtart Ver	4.50
+ 
+Example(s)	
+	;sample using only x,y on a 2d grid
+	$Point1 = "10,2"
+	$Point2 = "22,11"
+	? "the distance between Point1 and Point2 is " Distance($point1,$point2)
+
+	;sample using x,y,z in a 3d space
+	$Point1 = "10,2,33"
+	$Point2 = "22,11,66"
+	? "the distance between Point1 and Point2 is " Distance($point1,$point2)
+*/ 
+Function Distance($p1,$p2)
+	dim $i
+	$p1 = split($p1,',')
+	$p2 = split($p2,',')
+	if ubound($p1)<>ubound($p2) 
+		exit 2
+	endif
+	for $i = 0 to ubound($p1)
+		$p1[$i] = cdbl($p1[$i])
+		$p2[$i] = cdbl($p2[$i])
+	next
+	Select
+	   case ubound($p1) = 1
+		$Distance = sqrt(sqr(cdbl($p2[0])-$p1[0]) + sqr($p2[1]-$p1[1]))
+	   Case ubound($p1) = 2
+		$Distance = sqrt(sqr(cdbl($p2[0])-$p1[0]) + sqr($p2[1]-$p1[1]) + sqr($p2[2]-$p1[2]))
+	endselect
+endfunction

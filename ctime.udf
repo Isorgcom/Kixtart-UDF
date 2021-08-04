@@ -1,0 +1,65 @@
+;FUNCTION      cTime()
+;
+;ACTION        Converts a cTime time into Kixtart format
+;
+;AUTHOR        Richard Howarth
+;              Modified by Sealeopard
+;
+;VERSION       1.2
+;
+;KIXTART       4.12+
+;
+;SYNTAX        RETCODE = CTIME(SECONDS[, OFFSET])
+;
+;PARAMETERS    SECONDS
+;              time in cTime format seconds
+;
+;              OFFSET
+;              local time offset in hours
+;
+;RETURN        date and time in KiXtart format, i.e. 'YYYY-MM-DD HH:MM:SS'
+;
+;REMARKS       The algorithm used here is base in part on the following document:
+;              http://www.capecod.net/~pbaum/date/date0.htm
+;              Originally posted by Richard Howarth at
+;              http://81.17.37.55/board/ultimatebb.cgi?ubb=get_topic;f=4;t=000186
+;
+;DEPENDENCIES  none
+;
+;EXAMPLE       $retcode = cTime('1015861584',6)
+;
+;KIXTART BBS   http://www.kixtart.org/cgi-bin/ultimatebb.cgi?ubb=get_topic;f=12;t=000191
+;
+Function cTime($iSeconds,optional $iOffset)
+  Dim $iEpoch, $iDays, $iZ, $iH, $iA, $iB, $iC
+  Dim $iYear, $iMonth, $iDay, $iHour, $iMinutes
+
+  $iEpoch=719163
+
+  ; Adjust time for local
+  $iSeconds=Val($iSeconds)+(Val($iOffset*3600))
+  $iDays=$iSeconds/86400
+  $iSeconds=$iSeconds-($iDays*86400)
+
+  $iDays=$iDays+$iEpoch
+
+  $iZ=$iDays + 306
+  $iH=100*$iZ-25
+  $iA=$iH/3652425
+  $iB=$iA-$iA/4
+  $iYear=(100*$iB+$iH)/36525
+  $iC=$iB+$iZ-365*$iYear-$iYear/4
+  $iMonth=(5*$iC+456)/153
+  $iDay=$iC-(153*$iMonth-457)/5
+
+  if $iMonth > 12
+    $iYear=$iYear + 1
+    $iMonth = $iMonth - 12
+  endif
+
+  $iHour=$iSeconds / 3600
+  $iMinutes=($iSeconds-$iHour*3600)/60
+  $iSeconds=$iSeconds-$iHour*3600-$iMinutes*60
+  $cTime=''+$iYear+'/'+right('00'+$iMonth,2)+'/'+right('00'+$iDay,2)
+  $cTime=$cTime+' '+right('00'+$iHour,2)+':'+right('00'+$iMinutes,2)+':'+right('00'+$iSeconds,2)
+EndFunction

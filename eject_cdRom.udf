@@ -1,0 +1,66 @@
+;Function		EjectCDRom()  
+;  
+;Author		Bryce Lindsay bryce@isorg.net  
+;  
+;Action		Opens or Closes all cdroms on a computer.  
+;  
+;Syntax		EjectCDRom([Device#],[Close])  
+;  
+;Version		1.1  
+;  
+;Date Revised	2005/08/01  
+;  
+;Parameters	[Device] the cdrom device number, Use -1 for all devices,  
+;				Use 0 for the first device, and so on. 
+; 
+;		[Close] an optional true value to Close the cdrome drive.  
+;  
+;Remarks	Found this as some vbscript on the net, and converted it over to kix,   
+;		Put it into a UDF, also added the optional Close value  
+; 
+;		Original idea based on code from Christoph Fricke posted in the  
+;		microsoft.public.de.german.scripting.wsh news group 
+; 
+;		2005.08.01 Added optional Device number 
+; 
+;Returns	nothing  
+;  
+;Dependencies 	Windows Media player  
+;  
+;KiXtart Ver	4.22  
+;  
+;Example(s)	 
+;		;this will open ALL cdroms 
+;		EjectCDrom(-1) 
+;		;this will close ALL cdroms 
+;		EjectCDrom(-1,1) 
+; 
+;		;this will open the first cdrom  
+;		EjectCDrom(0)  
+;		;this will close the first cdrom  
+;		EjectCDrom(0,1)  
+; 
+;		;this will open the 2nd cdrom  
+;		ejectcdrom(1)			  
+;		;this will close the 2nd cdrom  
+;		ejectcdrom(1,1)			  
+
+Function EjectCDROM(optional $device,  $close)
+	DIM $owmp, $colCDROMs, $i
+
+	$oWMP = CreateObject("WMPlayer.OCX.7")
+	$colCDROMs = $oWMP.cdromCollection
+	If $colCDROMs.Count >= 1
+		If $Device+1
+			$colCDROMs.Item($device).Eject
+			If $close $colCDROMs.Item($Device).Eject EndIf
+		Else
+			;all CD ROMS
+			For $i = 0 To $colCDROMs.Count - 1
+				$colCDROMs.Item($i).Eject
+				If $close $colCDROMs.Item($i).Eject EndIf
+			Next
+		EndIf
+	EndIf
+	$oWMP.Close
+EndFunction

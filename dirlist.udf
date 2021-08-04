@@ -1,0 +1,135 @@
+;FUNCTION      DirList
+;
+;ACTION        Returns an array with a list of files in a given directory
+;
+;AUTHOR        Jens Meyer (sealeopard@usa.net)
+;
+;VERSION       1.3  fixed bug that did not pass $options into the recursive call
+;              1.2
+;
+;DATE CREATED  2002/01/18
+;
+;DATE MODIFIED 2007/02/22
+;
+;KIXTART       4.12
+;
+;SYNTAX        DIRLIST(DIRNAME [,OPTIONS])
+;
+;PARAMETERS    DIRNAME
+;              Required string containing the directory name
+;
+;              OPTIONS
+;              Optional value for additional options, options are set bitwise
+;              1 = include directories (denoted by a backslash) that match the search mask
+;              2 = include full path
+;              4 = search all subdirectories
+;
+;RETURNS       array with a list of files, otherwise an empty string
+;
+;REMARKS       none
+;
+;DEPENDENCIES  none
+;
+;EXAMPLE       $dirlist = DIRLIST("c:\*.*",1+2+4)
+;
+;KIXTART BBS   http://www.kixtart.org/ubbthreads/showflat.php?Cat=&Board=UBB12&Number=82077
+;
+function dirlist($dirname, optional $options)
+  dim $filename, $counter, $filepath, $mask
+  dim $list, $sublist, $subcounter
+
+  $counter=-1
+
+  $dirname=trim($dirname)
+  if $dirname=''
+    $dirname=@CURDIR
+  endif
+  if right($dirname,1)='\'
+    $dirname=left($dirname,len($dirname)-1)
+  endif
+  if getfileattr($dirname) & 16
+    $mask='*.*'
+  else
+    $mask=substr($dirname,instrrev($dirname,'\')+1)
+    $dirname=left($dirname,len($dirname)-len($mask)-1)
+  endif
+
+  redim $list[10]
+  $filename=dir($dirname+'\'+$mask)
+  while $filename<>'' and @ERROR=0
+    if $filename<>'.' and $filename<>'..'
+      select
+      case (getfileattr($dirname+'\'+$filename) & 16)
+        if $options & 1
+          $counter=$counter+1
+          if $options & 2
+            $list[$counter]=$dirname+'\'+$filename+'\'
+          else
+            $list[$counter]=$filename+'\'
+          endif
+        endif
+        if ($options & 4)
+          $sublist=dirlist($dirname+'\'+$filename+'\'+$mask,$options)
+          if ubound($sublist)+1
+            redim preserve $list[ubound($list)+ubound($sublist)+1]
+            for $subcounter=0 to ubound($sublist)
+              $counter=$counter+1
+              if $options & 2
+                $list[$counter]=$dirname+'\'+$filename+'\'+$sublist[$subcounter]
+              else
+                $list[$counter]=$filename+'\'+$sublist[$subcounter]
+              endif
+            next
+          endif
+        endif
+      case ($options & 2)
+        $counter=$counter+1
+        $list[$counter]=$dirname+'\'+$filename
+      case 1
+        $counter=$counter+1
+        $list[$counter]=$filename
+      endselect
+      if $counter mod 10
+        redim preserve $list[$counter+10]
+      endif
+    endif
+    $filename = dir('')
+  loop
+
+  if $counter+1
+    redim preserve $list[$counter]
+  else
+    $list=''
+  endif
+
+  if $mask<>'*.*' and ($options & 4)
+    $filename=dir($dirname+'\*.*')
+    while $filename<>'' and @ERROR=0
+      if $filename<>'.' and $filename<>'..'
+        if (getfileattr($dirname+'\'+$filename) & 16)
+          $sublist=dirlist($dirname+'\'+$filename+'\'+$mask,4)
+          if ubound($sublist)+1
+            redim preserve $list[ubound($list)+ubound($sublist)+1]
+            for $subcounter=0 to ubound($sublist)
+              $counter=$counter+1
+              if $options & 2
+                $list[$counter]=$dirname+'\'+$filename+'\'+$sublist[$subcounter]
+              else
+                $list[$counter]=$filename+'\'+$sublist[$subcounter]
+              endif
+            next
+          endif
+        endif
+      endif
+      $filename = dir('')
+    loop
+  endif
+
+  if $counter+1
+    redim preserve $list[$counter]
+  else
+    $list=''
+  endif
+
+  $dirlist=$list
+endfunction
