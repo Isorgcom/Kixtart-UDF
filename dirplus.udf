@@ -1,12 +1,12 @@
-;Function		DIRPlus()
+;Function	DIRPlus()
 ;
-;Author		Bryce Lindsay bryce@isorg.net
+;Author		Bryce Lindsay bryce@isorg.com
 ;
 ;Action		Returns an array containing directory files and folders
 ;
 ;Syntax		DIRPLUS("PATH","OPTIONS")
 ;
-;Version		2.34
+;Version	2.34
 ;
 ;Date Revised	2-10-05
 ;			2005.09.20 2.34 Filed the file/folder option "d" to be non language dependent, thanks Jochen
